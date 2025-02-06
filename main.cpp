@@ -7,34 +7,26 @@ Spieler2 = 2
 #include <vector> 
 #include <string>
 #include <sstream>   
+#include <cmath>
+#include <iomanip>          //benötigt für setw() -> um die Verrückunbg der 10er Splate zu verhindern
 
-class Piece{
-    public:
-        int position_x;
-        int position_y;
-        int player_id;
-
-    Piece(int posx, int posy, int PlayerID) : position_x(posx), position_y(posy), player_id(PlayerID){}
-};
-
-//Gameboard hat eine 10x10 matrix, board[x,y]= -1 ist ein weißes Feld, 0 ist ein freies schwarzes, 1 ist mit einem Piece von Player1 und 2 ist mit einem Piece von Player 2 besetzt
-//x ist vertikal, y ist horizontal
+//Gameboard hat eine 10x10 matrix, board[start_X,start_Y]= -1 ist ein weißes Feld, 0 ist ein freies schwarzes, 1 ist mit einem Piece von Player1 und 2 ist mit einem Piece von Player 2 besetzt
+//start_X ist vertikal, start_Y ist horizontal
 
 class GameBoard {
     public:
     
         int board[10][10];                                      //10x10 Bret
-        std::vector<Piece> Piece_Vektor;                        //Vektor, der alle pieces abspeichert -> pieces.push_back()
 
         void SetUpBoard () {                                    //Board wird initialisiert/gebaut
             for (int i = 0; i < 10; ++i) {                      //durch jedes Element des äußeren Array iterieren
                 for (int j = 0; j < 10; ++j) {                  //durch jedes innere Array iterieren
                     if (((i + j) % 2) == 1){                    //für jedes Schwarze Feld
                         if (i < 3){                             //falls spieler oben (2)
-                            Piece_Vektor.push_back(Piece(i,j,2));      //erstelle ein Piece
+    
                             board[i][j] = 2;}                   //markiere Feld mit 2
                         else if(i > 6){                         //falls Spieler unten(1)
-                            Piece_Vektor.push_back(Piece(i,j,1));
+
                             board[i][j] = 1;
                             }
                         else {
@@ -45,42 +37,55 @@ class GameBoard {
         }}}}
 
         void printBoard () {                                    //Board ausgeben
+            std::cout << "   A B C D E F G H I J" << std::endl;
             for (int i = 0; i < 10; ++i) {                      //außen
+                std::cout << std::setw(2) << 10 - i << " ";     //setw(2) setzt die width von jedem eintrag auf 2, dadurch wird verhindert dass die 10-er Reihe verrutscht weil die 10 2 stellen hat
                 for (int j = 0; j < 10; ++j) {                  //innen
                     if (board[i][j] == -1){
                         std::cout << "x ";}
                     else if (board[i][j] == 0){
                         std::cout << 0 << " ";}
                     else {
-                        for (const auto& piece : Piece_Vektor) {    //checke alle Pieces in Piece Vektor
-                        if (piece.position_x == i && piece.position_y == j) {   //ob das Piece auf Feld ij ist
-                            std::cout << piece.player_id << " ";    //falls ja, gib ID aus
-                    }}}}
+                        std::cout << board[i][j] << " ";
+                    }}
                     std::cout << std::endl;
         }}
 
-        bool isValidMove (int PlayerID, int x, int y, int x2, int y2) { //x,y sind die aktuellen Koordinaten, x2,y2 sind die Zielkoordinaten
-            if (board[x][y] != PlayerID) {                      //gehört die Figur dem Spieler?
-                return false;
-            }
-            else if (board[x2][y2] != 0) {                      //ist das Zielfeld frei?
-                return false;
-            }
-            else {
+        bool isValidInput (int start_X, int start_Y, int final_X, int final_Y){
+            
+            if ((start_X <= 10 && start_Y <= 10 && final_X <= 10 && final_Y <= 10) && 
+                (start_X >= 0 && start_Y >= 0 && final_X >= 0 && final_Y >= 0)) {
                 return true;
-            }
+                }
+            else {
+                std::cout << "Ungültige Eingabe!" << std::endl;
+                return false;
+                }
         }
 
-        void movePiece (int PlayerID, int x, int y, int x2, int y2) {   
-            if (isValidMove(PlayerID, x, y, x2, y2) == true){
-                for (auto& piece : Piece_Vektor) {    //checke alle Pieces in Piece Vektor
-                        if (piece.position_x == x && piece.position_y == y && piece.player_id == PlayerID) {   //ob das Piece auf Feld xy ist
-                            piece.position_x = x2;
-                            piece.position_y = y2;
-                            board[x][y] = 0;
-                            board[x2][y2] = PlayerID;
-                        }
-        }}}
+        bool isValidMove (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) { //start_X,start_Y sind die aktuellen Koordinaten, final_X,final_Y sind die Zielkoordinaten
+
+            if (isValidInput(start_X, start_Y, final_X, final_Y) == 1){         //überprüft ob die Eingabe wie erwartet ist
+                if (board[start_X][start_Y] != PlayerID) {                      //gehört die Figur dem Spieler, ist das Zielfeld frei?, ist das Zielfeld maximal 2 vom OG-Feld entfernt?
+                    std::cout << "Die Figur gehört nicht Spieler" << PlayerID << std::endl;
+                    return false;
+                }
+                else if (board[final_X][final_Y] != 0) {
+                    std::cout << "Das Zielfeld ist kein freies, schwarzes Feld!" << std::endl;
+                    return false;
+                }
+                else {
+                    return true;    
+                }}
+            else {
+                return false;}
+            }
+
+        void movePiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {   
+            if (isValidMove(PlayerID, start_X, start_Y, final_X, final_Y) == true){
+                board[start_X][start_Y] = 0;
+                board[final_X][final_Y] = PlayerID;
+        }}
         
 
 };
@@ -89,11 +94,23 @@ class GameBoard {
 
 int main(){
     int Zug = 0;
+    int PlayerToMove = 0;
+
     GameBoard game;
     game.SetUpBoard();
+
     while (true){
+
         Zug += 1;
         game.printBoard();
+
+        if (Zug % 2 == 0){
+            PlayerToMove = 2;
+        }
+        else {
+            PlayerToMove = 1;
+        }
+        std::cout << "Spieler " << PlayerToMove << " ist am Zug" << std::endl;
 
         std::cin.clear();                           //bevor eine Benutzereingabe eingegeben wird, wird der Eingabepuffer geleert, um falsche Eingaben zu vermeiden
         std::string BenutzerEingabe;
@@ -108,11 +125,15 @@ int main(){
         std::cout << "Startpunkt: " << startChar << startInt << std::endl;
         std::cout << "Endpunkt: " << endChar << endInt << std::endl;
 
-        int x = 10 - startInt;                      // 1 wird zu 9 etc, da arrays oben bei 0 starten, jedoch das oberste Feld 10 sein soll
-        int y = startChar - 'A';                     // A wird zu 0, J wird zu 9 etc
-        int x2 = 10 - endInt;                       // funktioniert, da die Buchstaben zu ihren ASCII-Werten umgerechnet werden, dadurch rechnet man z.B bei 'J' - 'A' 74 - 65 = 9 
-        int y2 = endChar - 'A';  
+        int start_X = 10 - startInt;                      // 1 wird zu 9 etc, da arrays oben bei 0 starten, jedoch das oberste Feld 10 sein soll
+        int start_Y = startChar - 'A';                     // A wird zu 0, J wird zu 9 etc
+        int final_X = 10 - endInt;                       // funktioniert, da die Buchstaben zu ihren ASCII-Werten umgerechnet werden, dadurch rechnet man z.B bei 'J' - 'A' 74 - 65 = 9 
+        int final_Y = endChar - 'A';  
 
-        std::cout << "Werte als Zahlen: " << x << " " << y << " : " << x2  << " " << y2 << std::endl;
+        std::cout << "Valid Move? " << game.isValidMove(PlayerToMove, start_X, start_Y, final_X, final_Y) << std::endl;
+
+        game.movePiece(PlayerToMove, start_X, start_Y, final_X, final_Y);
+
+        std::cout << "Werte als Zahlen: " << start_X << " " << start_Y << " : " << final_X  << " " << final_Y << std::endl;
     }
 }
