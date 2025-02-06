@@ -51,6 +51,19 @@ class GameBoard {
                     std::cout << std::endl;
         }}
 
+        void killPiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {
+            //movepiece wird nicht aufgerufen, da sonst nochmal die validity des Zugs geprüft wird
+            board[start_X][start_Y] = 0;
+            board[final_X][final_Y] = PlayerID;
+            if (PlayerID == 1) {
+                board[start_X - 1][start_Y + ((final_Y-start_Y)/2)] = 0;        //soll die übersprungene Figur zerstören
+            }
+            else if (PlayerID == 2){
+                board[start_X +1][start_Y + ((final_Y-start_Y)/2)] = 0;
+
+            }
+        }
+
         bool isValidInput (int start_X, int start_Y, int final_X, int final_Y){
             
             if ((start_X <= 10 && start_Y <= 10 && final_X <= 10 && final_Y <= 10) && 
@@ -70,22 +83,54 @@ class GameBoard {
                     std::cout << "Die Figur gehört nicht Spieler" << PlayerID << std::endl;
                     return false;
                 }
-                else if (board[final_X][final_Y] != 0) {
+                else if (board[final_X][final_Y] != 0) {                        //überprüft ob "Zielfeld ist kein freies, schwarzes Feld"
                     std::cout << "Das Zielfeld ist kein freies, schwarzes Feld!" << std::endl;
                     return false;
                 }
                 else {
-                    return true;    
-                }}
+                    if (PlayerID == 1){
+                        if ((start_X - final_X) == 1){
+                            return true;
+                        }
+
+                        else if ((start_X - final_X) == 2){
+                            std::cout << "Schlagen" << std::endl;
+                            killPiece(PlayerID, start_X, start_Y, final_X, final_Y);
+                            return false;
+                        }
+
+                        else {
+                            return false;
+                            std::cout << "Zu weit" << std::endl;
+                        }
+                }
+                    else if (PlayerID == 2){
+                        if ((start_X - final_X) == -1){
+                            return true;
+                        }
+                        else if ((start_X - final_X) == -2){
+                            std::cout << "Schlagen" << std::endl;
+                            killPiece(PlayerID, start_X, start_Y, final_X, final_Y);
+                            return false;
+                        }
+                        else {
+                            return false;
+                            std::cout << "Zu weit" << std::endl;
+                        }
+                        
+                }}}
             else {
                 return false;}
             }
+
 
         void movePiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {   
             if (isValidMove(PlayerID, start_X, start_Y, final_X, final_Y) == true){
                 board[start_X][start_Y] = 0;
                 board[final_X][final_Y] = PlayerID;
         }}
+
+        
         
 
 };
