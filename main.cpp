@@ -22,19 +22,16 @@ class GameBoard {
             for (int i = 0; i < 10; ++i) {                      //durch jedes Element des äußeren Array iterieren
                 for (int j = 0; j < 10; ++j) {                  //durch jedes innere Array iterieren
                     if (((i + j) % 2) == 1){                    //für jedes Schwarze Feld
-                        if (i < 3){                             //falls spieler oben (2)
-    
-                            board[i][j] = 2;}                   //markiere Feld mit 2
-                        else if(i > 6){                         //falls Spieler unten(1)
-
-                            board[i][j] = 1;
-                            }
-                        else {
-                            board[i][j] = 0;}                   //leere Felder = 0
+                        if (i < 3){board[i][j] = 2;}            //markiere Feld mit 2
+                        else if(i > 6){board[i][j] = 1;}
+                        else {board[i][j] = 0;}                 //leere Felder = 0
                     }
                     else {
                         board[i][j] = -1;                       //weiße/unspielbare Felder mit -1 markieren
-        }}}}
+                    }
+                }
+            }
+        }
 
         void printBoard () {                                    //Board ausgeben
             std::cout << "   A B C D E F G H I J" << std::endl;
@@ -47,95 +44,69 @@ class GameBoard {
                         std::cout << 0 << " ";}
                     else {
                         std::cout << board[i][j] << " ";
-                    }}
+                    }
+                }
                     std::cout << std::endl;
-        }}
+            }
+        }
 
         void killPiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {
-            //movepiece wird nicht aufgerufen, da sonst nochmal die validity des Zugs geprüft wird
-            board[start_X][start_Y] = 0;
-            board[final_X][final_Y] = PlayerID;
-            if (PlayerID == 1) {
-                board[start_X - 1][start_Y + ((final_Y-start_Y)/2)] = 0;        //soll die übersprungene Figur zerstören
-            }
-            else if (PlayerID == 2){
-                board[start_X +1][start_Y + ((final_Y-start_Y)/2)] = 0;
-
-            }
+            int middle_X = (start_X + final_X) / 2;
+            int middle_Y = (start_Y + final_Y) / 2;
+            std::cout << "Schlag\n";
+            board[middle_X][middle_Y] = 0;
         }
 
         bool isValidInput (int start_X, int start_Y, int final_X, int final_Y){
-            
-            if ((start_X <= 10 && start_Y <= 10 && final_X <= 10 && final_Y <= 10) && 
-                (start_X >= 0 && start_Y >= 0 && final_X >= 0 && final_Y >= 0)) {
+            if ((start_X < 10 && start_Y < 10 && final_X < 10 && final_Y < 10) && 
+                (start_X >= 0 && start_Y >= 0 && final_X >= 0 && final_Y >= 0) &&
+                (board[start_X][start_Y] != -1)) {
                 return true;
-                }
+            }
             else {
                 std::cout << "Ungültige Eingabe!" << std::endl;
                 return false;
-                }
+            }
         }
 
-        bool isValidMove (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) { //start_X,start_Y sind die aktuellen Koordinaten, final_X,final_Y sind die Zielkoordinaten
-
-            if (isValidInput(start_X, start_Y, final_X, final_Y) == 1){         //überprüft ob die Eingabe wie erwartet ist
-                if (board[start_X][start_Y] != PlayerID) {                      //gehört die Figur dem Spieler, ist das Zielfeld frei?, ist das Zielfeld maximal 2 vom OG-Feld entfernt?
-                    std::cout << "Die Figur gehört nicht Spieler" << PlayerID << std::endl;
-                    return false;
-                }
-                else if (board[final_X][final_Y] != 0) {                        //überprüft ob "Zielfeld ist kein freies, schwarzes Feld"
-                    std::cout << "Das Zielfeld ist kein freies, schwarzes Feld!" << std::endl;
-                    return false;
-                }
-                else {
-                    if (PlayerID == 1){
-                        if ((start_X - final_X) == 1){
-                            return true;
-                        }
-
-                        else if ((start_X - final_X) == 2){
-                            std::cout << "Schlagen" << std::endl;
-                            killPiece(PlayerID, start_X, start_Y, final_X, final_Y);
-                            return false;
-                        }
-
-                        else {
-                            return false;
-                            std::cout << "Zu weit" << std::endl;
-                        }
-                }
-                    else if (PlayerID == 2){
-                        if ((start_X - final_X) == -1){
-                            return true;
-                        }
-                        else if ((start_X - final_X) == -2){
-                            std::cout << "Schlagen" << std::endl;
-                            killPiece(PlayerID, start_X, start_Y, final_X, final_Y);
-                            return false;
-                        }
-                        else {
-                            return false;
-                            std::cout << "Zu weit" << std::endl;
-                        }
-                        
-                }}}
-            else {
-                return false;}
+        bool isValidMove (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {
+            if (!isValidInput(start_X, start_Y, final_X, final_Y)){
+                return false;
             }
+            if (board[start_X][start_Y] != PlayerID) {    
+                std::cout << "Die Figur gehört nicht Spieler " << PlayerID << std::endl;
+                return false;
+            }
+            else if (board[final_X][final_Y] != 0 || board[final_X][final_Y] == -1) {
+                std::cout << "Das Zielfeld ist kein freies, schwarzes Feld!" << std::endl;
+                return false;
+            }
+            else if (((PlayerID == 1) && ((start_X-final_X)==1) && (std::abs(start_Y-final_Y)==1)) ||
+                    ((PlayerID == 2) && ((start_X-final_X)==-1) && (std::abs(start_Y-final_Y)==1))) {
+                return true;
+            }
+            else if (((PlayerID == 1) && ((start_X-final_X)==2) && (std::abs(start_Y-final_Y)==2)) ||
+                    ((PlayerID == 2) && ((start_X-final_X)==-2) && (std::abs(start_Y-final_Y)==2))) {
+                int middle_X = (start_X + final_X) / 2;
+                int middle_Y = (start_Y + final_Y) / 2;
+                if ((board[middle_X][middle_Y] != 0) &&
+                    (board[middle_X][middle_Y] != PlayerID)) {
+                        killPiece(PlayerID, start_X, start_Y, final_X, final_Y);
+                        return true;
+                    }
+            }
+            return false;
+        }
 
-
-        void movePiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {   
-            if (isValidMove(PlayerID, start_X, start_Y, final_X, final_Y) == true){
-                board[start_X][start_Y] = 0;
-                board[final_X][final_Y] = PlayerID;
-        }}
-
-        
-        
-
+        void movePiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) { 
+            if (!isValidMove(PlayerID, start_X, start_Y, final_X, final_Y)){
+                std::cout << "Ungültige Koordinaten" << std::endl;
+                return;
+            }
+            board[start_X][start_Y] = 0;
+            board[final_X][final_Y] = PlayerID;
+        }
 };
-
-
 
 int main(){
     int Zug = 0;
@@ -176,9 +147,10 @@ int main(){
         int final_Y = endChar - 'A';  
 
         std::cout << "Valid Move? " << game.isValidMove(PlayerToMove, start_X, start_Y, final_X, final_Y) << std::endl;
+        std::cout << "Werte als Zahlen: " << start_X << " " << start_Y << " : " << final_X  << " " << final_Y << std::endl;
 
         game.movePiece(PlayerToMove, start_X, start_Y, final_X, final_Y);
 
-        std::cout << "Werte als Zahlen: " << start_X << " " << start_Y << " : " << final_X  << " " << final_Y << std::endl;
+       
     }
 }
