@@ -3,7 +3,8 @@ Spieler1 = 1
 Spieler2 = 2
 */
 
-#include <iostream>     
+#include <iostream>   
+#include <array>  
 #include <vector> 
 #include <string>
 #include <sstream>   
@@ -15,8 +16,10 @@ Spieler2 = 2
 
 class GameBoard {
     public:
-    
-        int board[10][10];                                      //10x10 Bret
+        
+        std::array<std::array<int, 10>, 10> board;
+        std::vector<std::array<std::array<int, 10>, 10>> boardSave; 
+        int piecesSlayn = 0;
 
         void SetUpBoard () {                                    //Board wird initialisiert/gebaut
             for (int i = 0; i < 10; ++i) {                      //durch jedes Element des äußeren Array iterieren
@@ -31,19 +34,20 @@ class GameBoard {
                     }
                 }
             }
+            saveBoard();
         }
 
         void printBoard () {                                    //Board ausgeben
-            std::cout << "   A B C D E F G H I J" << std::endl;
+            std::cout << "    A  B  C  D  E  F  G  H  I  J" << std::endl;
             for (int i = 0; i < 10; ++i) {                      //außen
                 std::cout << std::setw(2) << 10 - i << " ";     //setw(2) setzt die width von jedem eintrag auf 2, dadurch wird verhindert dass die 10-er Reihe verrutscht weil die 10 2 stellen hat
                 for (int j = 0; j < 10; ++j) {                  //innen
                     if (board[i][j] == -1){
-                        std::cout << "x ";}
+                        std::cout << std::setw(2) << "⬛ ";}
                     else if (board[i][j] == 0){
-                        std::cout << 0 << " ";}
+                        std::cout << std::setw(2) << 0 << " ";}
                     else {
-                        std::cout << board[i][j] << " ";
+                        std::cout << std::setw(2) << board[i][j] << " ";
                     }
                 }
                     std::cout << std::endl;
@@ -53,18 +57,19 @@ class GameBoard {
         void killPiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {
             int middle_X = (start_X + final_X) / 2;
             int middle_Y = (start_Y + final_Y) / 2;
-            std::cout << "Schlag\n";
+            piecesSlayn += 1;
+            std::cout << "Es wurden schon insgesamt " << piecesSlayn << " Figuren geschlagen\n";
             board[middle_X][middle_Y] = 0;
         }
 
         bool isValidInput (int start_X, int start_Y, int final_X, int final_Y){
             if ((start_X < 10 && start_Y < 10 && final_X < 10 && final_Y < 10) && 
                 (start_X >= 0 && start_Y >= 0 && final_X >= 0 && final_Y >= 0) &&
-                (board[start_X][start_Y] != -1)) {
+                (board[start_X][start_Y] != -1) && (board[final_X][final_Y] != -1)) {
                 return true;
             }
             else {
-                std::cout << "Ungültige Eingabe!" << std::endl;
+                std::cout << "Ungültige Eingabe!\n";
                 return false;
             }
         }
@@ -78,7 +83,7 @@ class GameBoard {
                 return false;
             }
             else if (board[final_X][final_Y] != 0 || board[final_X][final_Y] == -1) {
-                std::cout << "Das Zielfeld ist kein freies, schwarzes Feld!" << std::endl;
+                std::cout << "Das Zielfeld ist kein freies, schwarzes Feld!\n";
                 return false;
             }
             else if (((PlayerID == 1) && ((start_X-final_X)==1) && (std::abs(start_Y-final_Y)==1)) ||
@@ -100,37 +105,54 @@ class GameBoard {
 
         void movePiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) { 
             if (!isValidMove(PlayerID, start_X, start_Y, final_X, final_Y)){
-                std::cout << "Ungültige Koordinaten" << std::endl;
+                std::cout << "Ungültiger Zug\n";
                 return;
             }
             board[start_X][start_Y] = 0;
             board[final_X][final_Y] = PlayerID;
+        }
+        
+        void saveBoard() {
+            boardSave.push_back(board);
+        }
+
+        void previousMove() {
+            if (boardSave.size() > 1) {
+                boardSave.pop_back();
+                board = boardSave.back();
+                std::cout << "Vorherriger Spielstand geladen!\n";
+            }
+            else {
+                std::cout << "Es existiert kein früherer Spielstand!\n";
+            }
         }
 };
 
 int main(){
     int Zug = 0;
     int PlayerToMove = 0;
-
     GameBoard game;
     game.SetUpBoard();
 
     while (true){
-
-        Zug += 1;
         game.printBoard();
 
         if (Zug % 2 == 0){
-            PlayerToMove = 2;
+            PlayerToMove = 1;
         }
         else {
-            PlayerToMove = 1;
+            PlayerToMove = 2;
         }
         std::cout << "Spieler " << PlayerToMove << " ist am Zug" << std::endl;
 
         std::cin.clear();                           //bevor eine Benutzereingabe eingegeben wird, wird der Eingabepuffer geleert, um falsche Eingaben zu vermeiden
         std::string BenutzerEingabe;
         std::getline(std::cin, BenutzerEingabe);    //liest gesamte Zeil ein und speichert in benutzerEingabe
+
+        if (BenutzerEingabe == "-") {
+            game.previousMove();
+            continue;
+        }
 
         char startChar, endChar;                    //Es gibt insgesamt 4 Werte, diese werden eingeteilt in:
         int startInt, endInt;                       //Start und End Charackter (sprich B aus B6) und Start und End int (sprich 6 aus B6)
@@ -145,12 +167,12 @@ int main(){
         int start_Y = startChar - 'A';                     // A wird zu 0, J wird zu 9 etc
         int final_X = 10 - endInt;                       // funktioniert, da die Buchstaben zu ihren ASCII-Werten umgerechnet werden, dadurch rechnet man z.B bei 'J' - 'A' 74 - 65 = 9 
         int final_Y = endChar - 'A';  
-
+/*
         std::cout << "Valid Move? " << game.isValidMove(PlayerToMove, start_X, start_Y, final_X, final_Y) << std::endl;
         std::cout << "Werte als Zahlen: " << start_X << " " << start_Y << " : " << final_X  << " " << final_Y << std::endl;
-
+*/
         game.movePiece(PlayerToMove, start_X, start_Y, final_X, final_Y);
-
-       
+        game.saveBoard();
+        Zug += 1;
     }
 }
