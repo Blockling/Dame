@@ -1,18 +1,10 @@
-/*
-Spieler1 = 1
-Spieler2 = 2
-*/
-
 #include <iostream>   
 #include <array>  
 #include <vector> 
 #include <string>
-#include <sstream>   
+#include <sstream>          //benötigt, um die Eingabe in Einzelteile zu formatieren
 #include <cmath>
 #include <iomanip>          //benötigt für setw() -> um die Verrückunbg der 10er Splate zu verhindern
-
-//Gameboard hat eine 10x10 matrix, board[start_X,start_Y]= -1 ist ein weißes Feld, 0 ist ein freies schwarzes, 1 ist mit einem Piece von Player1 und 2 ist mit einem Piece von Player 2 besetzt
-//start_X ist vertikal, start_Y ist horizontal
 
 class GameBoard {
     public:
@@ -21,45 +13,35 @@ class GameBoard {
         std::vector<std::array<std::array<int, 10>, 10>> boardSave; 
         int piecesSlayn = 0;
 
-        void SetUpBoard () {                                    //Board wird initialisiert/gebaut
-            for (int i = 0; i < 10; ++i) {                      //durch jedes Element des äußeren Array iterieren
-                for (int j = 0; j < 10; ++j) {                  //durch jedes innere Array iterieren
-                    if (((i + j) % 2) == 1){                    //für jedes Schwarze Feld
-                        if (i < 3){board[i][j] = 2;}            //markiere Feld mit 2
+        void SetUpBoard () {                                    
+            for (int i = 0; i < 10; ++i) {                     
+                for (int j = 0; j < 10; ++j) {
+                    if (((i + j) % 2) == 1){
+                        if (i < 3){board[i][j] = 2;}
                         else if(i > 6){board[i][j] = 1;}
-                        else {board[i][j] = 0;}                 //leere Felder = 0
+                        else {board[i][j] = 0;}
                     }
-                    else {
-                        board[i][j] = -1;                       //weiße/unspielbare Felder mit -1 markieren
-                    }
+                    else {board[i][j] = -1; }                                     //weiße/unspielbare Felder werden mit -1 markiert
                 }
             }
             saveBoard();
         }
 
-        void printBoard () {                                    //Board ausgeben
-            std::cout << "    A  B  C  D  E  F  G  H  I  J" << std::endl;
-            for (int i = 0; i < 10; ++i) {                      //außen
-                std::cout << std::setw(2) << 10 - i << " ";     //setw(2) setzt die width von jedem eintrag auf 2, dadurch wird verhindert dass die 10-er Reihe verrutscht weil die 10 2 stellen hat
-                for (int j = 0; j < 10; ++j) {                  //innen
+        void printBoard () {
+            std::cout << "\n" << "    A  B  C  D  E  F  G  H  I  J" << std::endl;
+            for (int i = 0; i < 10; ++i) {
+                std::cout << std::setw(2) << 10 - i << " ";                     //setw verhindert die Verrückung durch 2-stellige Zahlen und das Unicode Symbol ⬛ und macht das Board übersichtlicher
+                for (int j = 0; j < 10; ++j) {
                     if (board[i][j] == -1){
                         std::cout << std::setw(2) << "⬛ ";}
                     else if (board[i][j] == 0){
                         std::cout << std::setw(2) << 0 << " ";}
                     else {
-                        std::cout << std::setw(2) << board[i][j] << " ";
-                    }
+                        std::cout << std::setw(2) << board[i][j] << " ";}
                 }
-                    std::cout << std::endl;
+                std::cout << std::endl;
             }
-        }
-
-        void killPiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {
-            int middle_X = (start_X + final_X) / 2;
-            int middle_Y = (start_Y + final_Y) / 2;
-            piecesSlayn += 1;
-            std::cout << "Es wurden schon insgesamt " << piecesSlayn << " Figuren geschlagen\n";
-            board[middle_X][middle_Y] = 0;
+            std::cout << "Es wurden schon insgesamt " << piecesSlayn << " Figuren geschlagen" << std::endl;
         }
 
         bool isValidInput (int start_X, int start_Y, int final_X, int final_Y){
@@ -69,7 +51,7 @@ class GameBoard {
                 return true;
             }
             else {
-                std::cout << "Ungültige Eingabe!\n";
+                std::cout << "Ungültige Eingabe! Achte Darauf dieses Format zu verwenden:\nGroßbuchstabe,Integer Großbuchstabe,Integer. z.B: C3 D4\n";
                 return false;
             }
         }
@@ -78,8 +60,8 @@ class GameBoard {
             if (!isValidInput(start_X, start_Y, final_X, final_Y)){
                 return false;
             }
-            if (board[start_X][start_Y] != PlayerID) {    
-                std::cout << "Die Figur gehört nicht Spieler " << PlayerID << std::endl;
+            else if (board[start_X][start_Y] != PlayerID) {
+                std::cout << "Das Feld gehört nicht Spieler " << PlayerID << std::endl;
                 return false;
             }
             else if (board[final_X][final_Y] != 0 || board[final_X][final_Y] == -1) {
@@ -100,18 +82,22 @@ class GameBoard {
                         return true;
                     }
             }
+            std::cout << "Das ist ein ungültiger Zug, versuche es nochmal! \n";
             return false;
         }
 
         void movePiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) { 
-            if (!isValidMove(PlayerID, start_X, start_Y, final_X, final_Y)){
-                std::cout << "Ungültiger Zug\n";
-                return;
-            }
             board[start_X][start_Y] = 0;
             board[final_X][final_Y] = PlayerID;
         }
-        
+
+        void killPiece (int PlayerID, int start_X, int start_Y, int final_X, int final_Y) {
+            int middle_X = (start_X + final_X) / 2;
+            int middle_Y = (start_Y + final_Y) / 2;
+            piecesSlayn += 1;
+            board[middle_X][middle_Y] = 0;
+        }
+
         void saveBoard() {
             boardSave.push_back(board);
         }
@@ -129,8 +115,8 @@ class GameBoard {
 };
 
 int main(){
-    int Zug = 0;
-    int PlayerToMove = 0;
+    int Zug = 1;
+    int PlayerToMove;
     GameBoard game;
     game.SetUpBoard();
 
@@ -138,39 +124,40 @@ int main(){
         game.printBoard();
 
         if (Zug % 2 == 0){
-            PlayerToMove = 1;
-        }
-        else {
             PlayerToMove = 2;
         }
-        std::cout << "Spieler " << PlayerToMove << " ist am Zug" << std::endl;
+        else {
+            PlayerToMove = 1;
+        }
+        std::cout << "Dies ist der " << Zug << "te Zug" << std::endl;
+        std::cout << "Spieler " << PlayerToMove << " ist am Zug\n";
 
-        std::cin.clear();                           //bevor eine Benutzereingabe eingegeben wird, wird der Eingabepuffer geleert, um falsche Eingaben zu vermeiden
+        std::cin.clear();
         std::string BenutzerEingabe;
-        std::getline(std::cin, BenutzerEingabe);    //liest gesamte Zeil ein und speichert in benutzerEingabe
+        std::getline(std::cin, BenutzerEingabe);
 
         if (BenutzerEingabe == "-") {
             game.previousMove();
+            Zug -= 1;
             continue;
         }
 
-        char startChar, endChar;                    //Es gibt insgesamt 4 Werte, diese werden eingeteilt in:
-        int startInt, endInt;                       //Start und End Charackter (sprich B aus B6) und Start und End int (sprich 6 aus B6)
+        char startChar, endChar;
+        int startInt, endInt;
 
-        std::istringstream ss(BenutzerEingabe);     //Der String wird in einen Stream??(als käme er aus std::cin) umgewandelt
-        ss >> startChar >> startInt >> endChar >> endInt; // Der Stream wird in die 4 Werte aufgeteilt
+        std::istringstream ss(BenutzerEingabe);                                     //String wird in Stream umgewandelt und aufgeteilt
+        ss >> startChar >> startInt >> endChar >> endInt;
 
-        std::cout << "Startpunkt: " << startChar << startInt << std::endl;
-        std::cout << "Endpunkt: " << endChar << endInt << std::endl;
-
-        int start_X = 10 - startInt;                      // 1 wird zu 9 etc, da arrays oben bei 0 starten, jedoch das oberste Feld 10 sein soll
-        int start_Y = startChar - 'A';                     // A wird zu 0, J wird zu 9 etc
-        int final_X = 10 - endInt;                       // funktioniert, da die Buchstaben zu ihren ASCII-Werten umgerechnet werden, dadurch rechnet man z.B bei 'J' - 'A' 74 - 65 = 9 
+        int start_X = 10 - startInt;
+        int start_Y = startChar - 'A';                                              //hier wird mit ASCII-Werten gerechnet
+        int final_X = 10 - endInt;
         int final_Y = endChar - 'A';  
-/*
-        std::cout << "Valid Move? " << game.isValidMove(PlayerToMove, start_X, start_Y, final_X, final_Y) << std::endl;
-        std::cout << "Werte als Zahlen: " << start_X << " " << start_Y << " : " << final_X  << " " << final_Y << std::endl;
-*/
+
+        if (!game.isValidMove(PlayerToMove, start_X, start_Y, final_X, final_Y)) {
+
+            continue;
+        }
+        else {std::cout << "Gültiger Zug! Wird ausgeführt...\n";}
         game.movePiece(PlayerToMove, start_X, start_Y, final_X, final_Y);
         game.saveBoard();
         Zug += 1;
