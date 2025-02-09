@@ -22,10 +22,10 @@ int main(){
         std::cout << "Spieler " << playerToMove << " ist am Zug\n";
 
         std::cin.clear();
-        std::string benutzerEingabe;
-        std::getline(std::cin, benutzerEingabe);
+        std::string userInput;
+        std::getline(std::cin, userInput);
 
-        if (benutzerEingabe == "-") {
+        if (userInput == "-") {
             game.previousMove();
             zug -= 1;
             continue;
@@ -35,7 +35,7 @@ int main(){
         int startInt, endInt;
 
         //String wird in Stream umgewandelt und aufgeteilt
-        std::istringstream ss(benutzerEingabe);
+        std::istringstream ss(userInput);
         ss >> startChar >> startInt >> endChar >> endInt;
 
         int start_X = 10 - startInt;
