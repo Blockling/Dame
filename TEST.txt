@@ -1,0 +1,19 @@
+Testcases:
+
+Benutzer gibt einen Zug ein, der:
+	nicht im korrekten Format (A1A1 oder B2 B2) ist			-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	nicht in der erlaubten Range ist (Z12)				-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	nur vertikal geht 						-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	nur horizontal geht						-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	zu weit geht							-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	auf ein weißes Feld geht					-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	versucht zu springen, ohne das ein gegner dazwischen ist	-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	in die falsche Richtung geht					-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	eine gegnerische Figur bewegt					-> Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	eine eigene Figur um 1 diagonal bewegt (richtige Richtung)	-> Programm nimmt die Eingabe an und bewegt die Spielfigur
+	mit einer eigenen Figur einen Gegner schlägt (2 diagonal)	-> Programm nimmt die Eingabe an, zerstört den generischen Stein, bewegt den eigenen Stein 
+									und erhöht die Anzahl der geschlagenen Steine um 1
+	"-"								-> Falls der benutzer mindestens einen Zug ausgeführt hat, wird der vorherige Spielstand geladen
+									sonst: Programm gibt Fehlermeldung zurück und wartet auf erneute Eingabe
+	
+	

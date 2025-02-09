@@ -1,8 +1,8 @@
 #include "header.hpp"
 
 int main(){
-    int zug = 1;
-    int playerToMove;
+    int Zug = 1;
+    int PlayerToMove;
     gameBoard game;
     game.setUpBoard();
     std::cout <<"1 sind Figuren von Spieler 1, 2 sind Figuren von Spieler 2 und 0 sind freie Felder.\n" <<
@@ -12,14 +12,14 @@ int main(){
     while (true){
         game.printBoard();
 
-        if (zug % 2 == 0){
-            playerToMove = 2;
+        if (Zug % 2 == 0){
+            PlayerToMove = 2;
         }
         else {
-            playerToMove = 1;
+            PlayerToMove = 1;
         }
-        std::cout << "Dies ist der " << zug << "te Zug" << std::endl;
-        std::cout << "Spieler " << playerToMove << " ist am Zug\n";
+        std::cout << "Dies ist der " << Zug << "te Zug" << std::endl;
+        std::cout << "Spieler " << PlayerToMove << " ist am Zug\n";
 
         std::cin.clear();
         std::string benutzerEingabe;
@@ -27,7 +27,7 @@ int main(){
 
         if (benutzerEingabe == "-") {
             game.previousMove();
-            zug -= 1;
+            Zug -= 1;
             continue;
         }
 
@@ -43,12 +43,12 @@ int main(){
         int final_X = 10 - endInt;
         int final_Y = endChar - 'A';  
 
-        if (!game.isValidMove(playerToMove, start_X, start_Y, final_X, final_Y)) {
+        if (!game.isValidMove(PlayerToMove, start_X, start_Y, final_X, final_Y)) {
             continue;
         }
         else {std::cout << "Gültiger Zug! Wird ausgeführt...\n\n";}
-        game.movePiece(playerToMove, start_X, start_Y, final_X, final_Y);
+        game.movePiece(PlayerToMove, start_X, start_Y, final_X, final_Y);
         game.saveBoard();
-        zug += 1;
+        Zug += 1;
     }
 }
