@@ -40,20 +40,20 @@ class GameBoard {
         *   @pre alle Felder des Boards müssen einen Wert haben
         */
         void printBoard () {
-            std::cout << "   ";
+            std::cout << std::setw(3) << " ";
             for (char c = 'A'; c <= 'J'; ++c) {                     
-                std::cout << std::setw(2) << c << " ";                              
+                std::cout << std::setw(3) << c;                              
             }
             std::cout << std::endl;
             for (int i = 0; i < 10; ++i) {
-                std::cout << std::setw(2) << 10 - i << " ";                         //setw verhindert die Verrückung durch 2-stellige Zahlen und das Unicode Symbol ⬜ und macht das Board übersichtlicher
+                std::cout << std::setw(3) << 10 - i;                         //setw verhindert die Verrückung durch 2-stellige Zahlen und das Unicode Symbol ⬜ und macht das Board übersichtlicher
                 for (int j = 0; j < 10; ++j) {          
                     if (board[i][j] == -1){
-                        std::cout << std::setw(2) << "⬜ ";}                       //anstatt von -1 wird ⬜ für unspielbare Felder ausgegeben
+                        std::cout << std::setw(3) << " ⬜";}                       //anstatt von -1 wird ⬜ für unspielbare Felder ausgegeben
                     else if (board[i][j] == 0){
-                        std::cout << std::setw(2) << 0 << " ";}
+                        std::cout << std::setw(3) << 0;}
                     else {
-                        std::cout << std::setw(2) << board[i][j] << " ";}
+                        std::cout << std::setw(3) << board[i][j];}
                 }
                 std::cout << std::endl;
             }
