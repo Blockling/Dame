@@ -57,16 +57,17 @@ class gameBoard {
         *       Mit der setw() funktion sollten alle Spalten untereinander gerade sein
         */
         void printBoard () {
-            std::cout << std::setw(3) << " ";                                      //setw verhindert die Verrückung durch 2-stellige Zahlen und das Unicode Symbol ⬜ und macht das Board übersichtlicher
+            std::cout << std::setw(3) << "  ";                                      //setw verhindert die Verrückung durch 2-stellige Zahlen und das Unicode Symbol ⬜ und macht das Board übersichtlicher
             for (char c = 'A'; c <= 'J'; ++c) {                     
-                std::cout << std::setw(3) << c;                              
+                std::cout << " ";
+                std::cout << std::setw(2) << c;                           
             }
             std::cout << std::endl;
             for (int i = 0; i < 10; ++i) {
                 std::cout << std::setw(3) << 10 - i;
                 for (int j = 0; j < 10; ++j) {          
                     if (board[i][j] == -1){
-                        std::cout << std::setw(3) << " ⬜";}                       //anstatt von -1 wird ⬜ für unspielbare Felder ausgegeben
+                        std::cout << std::setw(5) << " ⬜";}                       //anstatt von -1 wird ⬜ für unspielbare Felder ausgegeben
                     else if (board[i][j] == 0){
                         std::cout << std::setw(3) << 0;}
                     else {
