@@ -33,11 +33,12 @@ int main(){
         char startChar, endChar;
         int startInt, endInt;
 
-        std::istringstream ss(BenutzerEingabe);                                     //String wird in Stream umgewandelt und aufgeteilt
+        //String wird in Stream umgewandelt und aufgeteilt
+        std::istringstream ss(BenutzerEingabe);
         ss >> startChar >> startInt >> endChar >> endInt;
 
         int start_X = 10 - startInt;
-        int start_Y = startChar - 'A';                                              //hier wird mit ASCII-Werten gerechnet
+        int start_Y = startChar - 'A';
         int final_X = 10 - endInt;
         int final_Y = endChar - 'A';  
 
